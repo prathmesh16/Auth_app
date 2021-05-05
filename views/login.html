@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>this is login page</h1>
+        <form action="/verify" method="POST">
+            <input type="text" placeholder="Enter name" name="name"/>
+            <br>
+            <input type="password" placeholder="Enter password" name="pass"/>
+            <br>
+            <% if(err){ %>
+                    <h4>Username or password is incorrect</h4>
+                <% } %>
+            <button type="submit">Log In</button>
+        </form>
+        <a href="/signup">Sign up</a>
+    </body>
+    <script>
+        var token = localStorage.getItem('token');
+        if(token)
+        {
+          jQuery.ajax({
+            url:"http://localhost:3000/verifyToken?token="+token,
+            method: 'get',
+            contentType: 'application/json',
+          }).done(function(result){
+            console.log(result);
+            if(result.success)
+              window.location.href="/homepage?name="+result.name;
+            else
+              localStorage.clear();    
+          }).fail(function(error){
+            console.log(error);
+          });
+        }
+
+    </script>
+</html>

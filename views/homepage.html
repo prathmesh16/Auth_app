@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <h1>This is homepage</h1>
+        <h2 id="username">welcome</h2>
+        <button onclick="logout()">Logout</button>
+    </body>
+    <script>
+        var user;
+        var token = localStorage.getItem('token');
+        var token1;
+        if(token)
+        {
+          jQuery.ajax({
+            url:"http://localhost:3000/verifyToken?token="+token,
+            method: 'get',
+            contentType: 'application/json',
+          }).done(function(result){
+            console.log(result);
+            if(!result.success)
+            {
+                localStorage.clear();
+                window.location.href="/login";  
+            }
+          }).fail(function(error){
+            console.log(error);
+          });
+        }
+        else
+        {
+            var url = window.location.href; 
+
+            try{
+                var captured = /token=([^&]+)/.exec(url)[1]; // Value is in [1] ('384' in our case)
+                token1 = captured ? captured : null;
+                console.log(token1);     
+            }
+            catch{
+
+            }
+           
+            if(token1)
+                localStorage.setItem('token',token1);
+            else
+                window.location.href="/login";   
+               
+        }
+
+        if(token || token1 )
+        {
+            var tokenToSend = (token==null) ? token1 : token;
+            jQuery.ajax({
+                url:"http://localhost:3000/getUser?token="+tokenToSend,
+                method: 'get',
+                contentType: 'application/json',
+                }).done(function(result){
+                console.log(result);
+                if(result.success)
+                {
+                    user=result.user;
+                    setData();
+                }
+                }).fail(function(error){
+                console.log(error);
+                });
+        }  
+        
+        function setData()
+        {
+            document.getElementById("username").innerHTML="Welcome "+user.username;
+        }
+        function logout(){
+            localStorage.clear();
+            window.location.href="/login";
+        }
+        
+    </script>
+</html>
